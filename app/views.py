@@ -1,5 +1,7 @@
 from django.shortcuts import render
 
+
+from rest_framework.generics import get_object_or_404
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -26,6 +28,38 @@ def doctor_list_create_api_view(request):
             return Response(serializer.errors, status=400)
 
 
-class PatientListCreateAPIView(generics.ListCreateAPIView):
-    queryset = models.Patient.objects.all()
-    serializer_class = serializers.PatientSerializer
+@api_view(http_method_names=["GET", "POST"])
+def patient_list_create_api_view(request):
+    if request.method == "GET":
+        patients = models.Patient.objects.all()
+        serializer = serializers.PatientSerializer(instance=patients, many=True)
+        return Response(serializer.data, status=200)
+    if request.method == "POST":
+        serializer = serializers.PatientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        else:
+            return Response(serializer.errors, status=400)
+
+
+@api_view(http_method_names=["GET", "PUT", "DELETE"])
+def patient_retrieve_update_destroy_api_view(request, pk):
+    patient = get_object_or_404(models.Patient, pk=pk)
+
+    if request.method == "GET":
+        serializer = serializers.PatientSerializer(instance=patient)
+        return Response(serializer.data)
+
+    if request.method == "PUT":
+        serializer = serializers.PatientSerializer(instance=patient, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        else:
+            return Response(serializer.errors, status=400)
+
+    if request.method == "DELETE":
+        patient.delete()
+        return Response(status=204)
+
