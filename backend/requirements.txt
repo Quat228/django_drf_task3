@@ -2,5 +2,5 @@ django==4.2
 djangorestframework
 django-cors-headers
 drf-yasg
-psycopg2
+psycopg2-binary
 django-environ
