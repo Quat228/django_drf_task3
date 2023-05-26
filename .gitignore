@@ -4,3 +4,5 @@ media/
 **/__pycache__/**
 
 .env
+.env.prod
+.env.db.prod
